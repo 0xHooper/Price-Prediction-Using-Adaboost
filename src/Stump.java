@@ -73,7 +73,7 @@ public class Stump {
         return stumpLabel == label ? 0 : weight;
     }
 
-    public static ColumnData getColumnData(List<PriceData> set, int columnIndex){
+    private static ColumnData getColumnData(List<PriceData> set, int columnIndex){
         List<Double> columnData = new ArrayList<>();
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
@@ -102,12 +102,12 @@ public class Stump {
                 ", alpha=" + alpha;
     }
 
-    static class ColumnData {
+    private static class ColumnData {
         private final List<Double> data;
         private final double min;
         private final double max;
 
-        public ColumnData(List<Double> data, double min, double max) {
+        private ColumnData(List<Double> data, double min, double max) {
             this.data = data;
             this.min = min;
             this.max = max;
