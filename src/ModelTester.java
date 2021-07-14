@@ -16,9 +16,13 @@ public class ModelTester {
     }
 
     private void test(){
-        model.getModel().forEach(e -> System.out.println(e.toString()));
+        printModelInfo();
         countResults();
         countMaxInARow();
+    }
+
+    private void printModelInfo() {
+        model.getModel().forEach(e -> System.out.println(e.toString()));
     }
 
     private void countResults() {
@@ -60,7 +64,7 @@ public class ModelTester {
         }
     }
 
-    public void printInfo(double positionSize){
+    public void printTestInfo(double positionSize){
         System.out.println("Profitable trade/all trades " + truePositive + "/" + (truePositive+falsePositive));
         System.out.println("Precision " + ((double)truePositive/(truePositive+falsePositive)));
         System.out.println("Max wins in a row: " + maxTrueInARow);

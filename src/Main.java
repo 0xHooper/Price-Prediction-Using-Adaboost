@@ -8,6 +8,6 @@ public class Main {
         Adaboost model = new Adaboost(dataPreparation.getTrainingSet(), 10, 18, dataImporter.columnNames);
 
         ModelTester modelTester = new ModelTester(model, dataPreparation.getTestingSet());
-        modelTester.printInfo(100);
+        modelTester.printTestInfo(100);
     }
 }
