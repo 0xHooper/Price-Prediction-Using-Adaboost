@@ -2,61 +2,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModelTester {
-    int truePositive = 0, trueNegative = 0, falsePositive = 0, falseNegative = 0;
-    int maxTrueInARow = 0;
-    int maxFalseInARow = 0;
+    private final Adaboost model;
+    private final List<PriceData> testingSet;
+
+    private int truePositive = 0, trueNegative = 0, falsePositive = 0, falseNegative = 0;
+    private int maxTrueInARow = 0, maxFalseInARow = 0;
+    private final List<Boolean> makeTradeResults = new ArrayList<>();
 
     public ModelTester(Adaboost model, List<PriceData> testingSet) {
-        test(model, testingSet);
+        this.model = model;
+        this.testingSet = testingSet;
+        test();
     }
 
-    private void test(Adaboost adaboost, List<PriceData> testingSet){
-        adaboost.getModel().forEach(e -> System.out.println(e.toString()));
-        testing(adaboost, testingSet);
+    private void test(){
+        model.getModel().forEach(e -> System.out.println(e.toString()));
+        countResults();
+        countMaxInARow();
     }
 
-    private void testing(Adaboost adaboost,List<PriceData> testingSet){
-        List<Boolean> list = new ArrayList<>();
-        countResults(adaboost, testingSet, list);
-        countMaxInARow(list);
-    }
-
-    private void countResults(Adaboost adaboost, List<PriceData> testingSet, List<Boolean> list) {
-        for (PriceData p : testingSet){
-            int classifiedAs = adaboost.classify(p.numbersData);
+    private void countResults() {
+        for (PriceData currentRow : testingSet){
+            int classifiedAs = model.classify(currentRow.numbersData);
             if (classifiedAs == 1)
-                if (classifiedAs == p.label) {
+                if (classifiedAs == currentRow.label) {
                     truePositive++;
-                    list.add(true);
+                    makeTradeResults.add(true);
                 }
                 else {
                     falsePositive++;
-                    list.add(false);
+                    makeTradeResults.add(false);
                 }
             if (classifiedAs == -1)
-                if(classifiedAs == p.label)
+                if(classifiedAs == currentRow.label)
                     trueNegative++;
                 else
                     falseNegative++;
         }
     }
 
-    private void countMaxInARow(List<Boolean> list) {
+    private void countMaxInARow() {
         int currentInARow = 0;
-        boolean previous = false;
-        for (boolean b : list){
-            if (b == previous){
+        boolean previous = !makeTradeResults.get(0);
+        for (boolean singleResult : makeTradeResults){
+            if (singleResult == previous){
                 currentInARow++;
             } else
                 currentInARow = 1;
-            if (b){
+            if (singleResult){
                 if (maxTrueInARow < currentInARow)
                     maxTrueInARow = currentInARow;
             } else {
                 if (maxFalseInARow < currentInARow)
                     maxFalseInARow = currentInARow;
             }
-            previous = b;
+            previous = singleResult;
         }
     }
 
@@ -65,6 +65,6 @@ public class ModelTester {
         System.out.println("Precision " + ((double)truePositive/(truePositive+falsePositive)));
         System.out.println("Max wins in a row: " + maxTrueInARow);
         System.out.println("Max loss in a row: " + maxFalseInARow);
-        System.out.println("Potential profit " + (truePositive*0.15 - falsePositive*0.07)*positionSize);
+        System.out.println("Potential profit " + (truePositive*0.15 - falsePositive*0.07) *positionSize);
     }
 }
