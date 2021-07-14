@@ -7,7 +7,7 @@ public class Main {
         System.out.println("training...");
         Adaboost model = new Adaboost(dataPreparation.getTrainingSet(), 10, 18);
 
-        DataTester dataTester = new DataTester(model, dataPreparation.getTestingSet());
-        dataTester.printInfo(100);
+        ModelTester modelTester = new ModelTester(model, dataPreparation.getTestingSet());
+        modelTester.printInfo(100);
     }
 }

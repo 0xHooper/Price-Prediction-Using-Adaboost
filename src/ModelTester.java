@@ -1,12 +1,12 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataTester {
+public class ModelTester {
     int truePositive = 0, trueNegative = 0, falsePositive = 0, falseNegative = 0;
     int maxTrueInARow = 0;
     int maxFalseInARow = 0;
 
-    public DataTester(Adaboost model, List<PriceData> testingSet) {
+    public ModelTester(Adaboost model, List<PriceData> testingSet) {
         test(model, testingSet);
     }
 
