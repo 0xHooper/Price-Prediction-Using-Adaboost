@@ -6,18 +6,18 @@ import java.util.stream.IntStream;
 public class Adaboost {
     private List<Stump> model;
 
-    public Adaboost(List<PriceData> trainingSet, int numberOfSteps, int maxIteration) {
-        train(trainingSet, numberOfSteps, maxIteration);
+    public Adaboost(List<PriceData> trainingSet, int numberOfSteps, int maxIteration, List<String> columnNames) {
+        train(trainingSet, numberOfSteps, maxIteration, columnNames);
     }
 
-    private void train(List<PriceData> trainingSet, int numberOfSteps, int maxIteration) {
+    private void train(List<PriceData> trainingSet, int numberOfSteps, int maxIteration, List<String> columnNames) {
         int samplesCount = trainingSet.size();
         double[] weights = new double[samplesCount];
         Arrays.fill(weights, ((double) 1 / samplesCount));
 
         List<Stump> model = new ArrayList<>();
         for (int i = 0; i < maxIteration; i++) {
-            Stump stump = Stump.bestStump(trainingSet, numberOfSteps, weights);
+            Stump stump = Stump.bestStump(trainingSet, numberOfSteps, weights, columnNames);
             model.add(stump);
 
             weights = updateWeights(trainingSet, stump, weights);

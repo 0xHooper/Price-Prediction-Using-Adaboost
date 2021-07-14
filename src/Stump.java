@@ -11,17 +11,19 @@ public class Stump {
     private double weightedError;
     double alpha;
     private final int[] classEst;
+    public List<String> columnNames;
 
-    private Stump(double threshold, char operation, int columnIndex, int samplesCount) {
+    private Stump(double threshold, char operation, int columnIndex, int samplesCount, List<String> columnNames) {
         this.threshold = threshold;
         this.operation = operation;
         this.columnIndex = columnIndex;
         this.classEst = new int[samplesCount];
+        this.columnNames = columnNames;
     }
 
-    public static Stump bestStump(List<PriceData> trainingSet, int numberOfSteps, double[] weights) {
-        int columnsCount = trainingSet.get(0).numbersData.size(); // =8
-        Stump bestStump = new Stump(0,'0',0,0);
+    public static Stump bestStump(List<PriceData> trainingSet, int numberOfSteps, double[] weights, List<String> columnNames) {
+        int columnsCount = trainingSet.get(0).numbersData.size();
+        Stump bestStump = new Stump(0,'0',0,0, columnNames);
         double minError = Double.MAX_VALUE;
 
         for (int i = 4; i < columnsCount; i++) {
@@ -30,7 +32,7 @@ public class Stump {
             double currentThreshold = columnData.min + stepSize;
             for (;Double.compare(currentThreshold, columnData.max) < 0; currentThreshold += stepSize){
                 for (char operation : OP_ARRAY) {
-                    Stump currentStump = new Stump(currentThreshold, operation, i, trainingSet.size());
+                    Stump currentStump = new Stump(currentThreshold, operation, i, trainingSet.size(), columnNames);
                     currentStump.weightedError = currentStump.calculateColumnWeightedError(columnData, weights, trainingSet);
                     if (Double.compare(minError, currentStump.weightedError) == 1) {
                         minError = currentStump.weightedError;
@@ -96,10 +98,10 @@ public class Stump {
 
     @Override
     public String toString() {
-        return "threshold=" + threshold +
-                ", operation=" + operation +
-                ", columnIndex=" + columnIndex +
-                ", alpha=" + alpha;
+        return "threshold= " + threshold +
+                ", operation= " + operation +
+                ", columnName= " + columnNames.get(columnIndex+1) +
+                ", alpha= " + alpha;
     }
 
     private static class ColumnData {

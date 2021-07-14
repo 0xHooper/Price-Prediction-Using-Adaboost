@@ -5,7 +5,7 @@ public class Main {
         DataPreparation dataPreparation = new DataPreparation(dataImporter, 1.15, 0.93);
 
         System.out.println("training...");
-        Adaboost model = new Adaboost(dataPreparation.getTrainingSet(), 10, 18);
+        Adaboost model = new Adaboost(dataPreparation.getTrainingSet(), 10, 18, dataImporter.columnNames);
 
         ModelTester modelTester = new ModelTester(model, dataPreparation.getTestingSet());
         modelTester.printInfo(100);
