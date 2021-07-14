@@ -4,8 +4,8 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class DataImporter {
-    List<PriceData> priceData;
-    List<String> columnNames = new ArrayList<>();
+    private List<PriceData> priceData;
+    private final List<String> columnNames = new ArrayList<>();
 
     DataImporter(String file){
         try {
@@ -17,13 +17,12 @@ public class DataImporter {
     }
 
     private List<PriceData> getDataFromCSVFile(Scanner scanner) {
-        List<PriceData> data = new LinkedList<>();
+        List<PriceData> data = new ArrayList<>();
         getColumnNames(scanner);
         /*
         skipping first 600 rows to get data selected manually
          */
         IntStream.range(0, 600).forEach(i -> scanner.nextLine());
-        data.add(readDataFromLine(scanner));
         while(scanner.hasNext()){
             data.add(readDataFromLine(scanner));
         }
@@ -44,5 +43,13 @@ public class DataImporter {
             numbers.add(Double.parseDouble(lineData[i]));
         }
         return new PriceData(data, numbers);
+    }
+
+    public List<PriceData> getPriceData() {
+        return priceData;
+    }
+
+    public List<String> getColumnNames() {
+        return columnNames;
     }
 }

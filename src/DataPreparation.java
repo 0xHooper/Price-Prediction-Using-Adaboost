@@ -2,24 +2,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataPreparation {
-    List<PriceData> trainingSet = new ArrayList<>();
-    List<PriceData> testingSet = new ArrayList<>();
+    private final List<PriceData> trainingSet = new ArrayList<>();
+    private final List<PriceData> testingSet = new ArrayList<>();
 
-    public DataPreparation(DataImporter dataImporter, double reward, double risk){
-        labelData(dataImporter, reward, risk);
-        prepareDataForClassification(dataImporter);
+    private final List<PriceData> priceData;
+
+    public DataPreparation(List<PriceData> priceData, double reward, double risk){
+        this.priceData = priceData;
+
+        labelData(reward, risk);
+        prepareDataForClassification();
 
         int numberOfNotTradeWeWant = 360;
         int numberOfMakeTradeWeWant = 360;
 
-        splitDataIntoSets(dataImporter, numberOfNotTradeWeWant, numberOfMakeTradeWeWant);
+        splitDataIntoSets(numberOfNotTradeWeWant, numberOfMakeTradeWeWant);
     }
 
-    private void splitDataIntoSets(DataImporter dataImporter, int numberOfNotTradeWeWant, int numberOfMakeTradeWeWant) {
-        for (int i = 0; i< dataImporter.priceData.size(); i++) {
+    private void splitDataIntoSets(int numberOfNotTradeWeWant, int numberOfMakeTradeWeWant) {
+        for (int i = 0; i< priceData.size(); i++) {
             if (i==0)
-                System.out.println("Training test start date " + dataImporter.priceData.get(i).date);
-            PriceData h = dataImporter.priceData.get(i);
+                System.out.println("Training test start date " + priceData.get(i).date);
+            PriceData h = priceData.get(i);
             if (h.label == 1) {
                 if (numberOfMakeTradeWeWant > 0) {
                     trainingSet.add(h);
@@ -37,46 +41,45 @@ public class DataPreparation {
         }
     }
 
-    private void labelData(DataImporter dataImporter, double reward, double risk) {
-        for (int i = 0; i < dataImporter.priceData.size(); i++){
+    private void labelData(double reward, double risk) {
+        for (int i = 0; i < priceData.size(); i++){
             int j = i;
-            double currentOpen = dataImporter.priceData.get(i).numbersData.get(0);
-            boolean hitHigh = dataImporter.priceData.get(j).numbersData.get(1) >= currentOpen * reward;
-            boolean hitLow = dataImporter.priceData.get(j).numbersData.get(2) <= currentOpen * risk;
-            while (!hitHigh && !hitLow && j< dataImporter.priceData.size()-1){
+            double currentOpen = priceData.get(i).numbersData.get(0);
+            boolean hitHigh = priceData.get(j).numbersData.get(1) >= currentOpen * reward;
+            boolean hitLow = priceData.get(j).numbersData.get(2) <= currentOpen * risk;
+            while (!hitHigh && !hitLow && j< priceData.size()-1){
                 j++;
-                hitHigh = dataImporter.priceData.get(j).numbersData.get(1) >= currentOpen* reward;
-                hitLow = dataImporter.priceData.get(j).numbersData.get(2) <= currentOpen* risk;
+                hitHigh = priceData.get(j).numbersData.get(1) >= currentOpen* reward;
+                hitLow = priceData.get(j).numbersData.get(2) <= currentOpen* risk;
             }
             // removing data rows, that cannot be labeled
             if (!hitHigh && !hitLow){
-                removeUnlabeledData(dataImporter, i);
+                removeUnlabeledData(i);
                 break;
             }
             // setting label
             else if (hitHigh)
-                dataImporter.priceData.get(i).label = 1.0;
+                priceData.get(i).label = 1.0;
             else
-                dataImporter.priceData.get(i).label = -1.0;
+                priceData.get(i).label = -1.0;
         }
     }
 
-    private void removeUnlabeledData(DataImporter dataImporter, int startIndex) {
-        int dataToRemove = dataImporter.priceData.size() - startIndex;
+    private void removeUnlabeledData(int startIndex) {
+        int dataToRemove = priceData.size() - startIndex;
         while(dataToRemove > 0) {
-            dataImporter.priceData.remove(dataImporter.priceData.size() - 1);
+            priceData.remove(priceData.size() - 1);
             dataToRemove--;
         }
     }
 
-    private void prepareDataForClassification(DataImporter dataImporter) {
+    private void prepareDataForClassification() {
         /*
         As algorithm use only RSI and MACD indicators, normalization can be skipped
          */
-        for (int i = dataImporter.priceData.size()-1;i>0;i--){
-            for (int j = 4;j<dataImporter.priceData.get(i).numbersData.size();j++){
-                dataImporter.priceData.get(i).numbersData.set(j, dataImporter.priceData.get(i-1).numbersData.get(j));
-
+        for (int i = priceData.size()-1;i>0;i--){
+            for (int j = 4;j<priceData.get(i).numbersData.size();j++){
+                priceData.get(i).numbersData.set(j, priceData.get(i-1).numbersData.get(j));
             }
         }
         System.out.println("Data prepared for classification");
