@@ -5,13 +5,16 @@ public class Stump {
     private static final char OP_LESSER_THAN = '<';
     private static final char OP_GREATER_THAN = '>';
     private static final char[] OP_ARRAY = { OP_LESSER_THAN, OP_GREATER_THAN };
+
     private final double threshold;
     private final char operation;
-    private final int columnIndex;
     private double weightedError;
     private double alpha;
+
     private final int[] classifiedAs;
+
     private final List<String> columnNames;
+    private final int columnIndex;
 
     private Stump(double threshold, char operation, int columnIndex, int samplesCount, List<String> columnNames) {
         this.threshold = threshold;
@@ -21,27 +24,42 @@ public class Stump {
         this.columnNames = columnNames;
     }
 
-    public static Stump bestStump(List<PriceData> trainingSet, int numberOfSteps, double[] weights, List<String> columnNames) {
+    public static Stump findBestStump(List<PriceData> trainingSet, int numberOfSteps, double[] weights, List<String> columnNames) {
         int numberOfColumns = trainingSet.get(0).numbersData.size();
         Stump bestStump = new Stump(0,'0',0,0, columnNames);
-        double minError = Double.MAX_VALUE;
+        bestStump.weightedError = Double.MAX_VALUE;
 
+        bestStump = countBestStumpForSet(trainingSet, numberOfSteps, weights, columnNames, numberOfColumns, bestStump);
+        bestStump.alpha = 0.5* Math.log((1 - bestStump.getWeightedError())/bestStump.getWeightedError());
+
+        return bestStump;
+    }
+
+    private static Stump countBestStumpForSet(List<PriceData> trainingSet, int numberOfSteps, double[] weights, List<String> columnNames, int numberOfColumns, Stump bestStump) {
         for (int i = 4; i < numberOfColumns; i++) {
             ColumnData columnData = getColumnData(trainingSet, i);
-            double stepSize = (columnData.max - columnData.min)/numberOfSteps;
+            double stepSize = (columnData.max - columnData.min)/ numberOfSteps;
             double currentThreshold = columnData.min + stepSize;
-            for (;Double.compare(currentThreshold, columnData.max) < 0; currentThreshold += stepSize){
-                for (char operation : OP_ARRAY) {
-                    Stump currentStump = new Stump(currentThreshold, operation, i, trainingSet.size(), columnNames);
-                    currentStump.weightedError = currentStump.calculateColumnWeightedError(columnData, weights, trainingSet);
-                    if (Double.compare(minError, currentStump.weightedError) == 1) {
-                        minError = currentStump.weightedError;
-                        bestStump = currentStump;
-                    }
-                }
+            bestStump = countBestStumpForColumn(trainingSet, weights, columnNames, bestStump, i, columnData, stepSize, currentThreshold);
+        }
+        return bestStump;
+    }
+
+    private static Stump countBestStumpForColumn(List<PriceData> trainingSet, double[] weights, List<String> columnNames, Stump bestStump, int i, ColumnData columnData, double stepSize, double currentThreshold) {
+        for (; Double.compare(currentThreshold, columnData.max) < 0; currentThreshold += stepSize){
+            for (char operation : OP_ARRAY) {
+                bestStump = countStump(trainingSet, weights, columnNames, bestStump, i, columnData, currentThreshold, operation);
             }
         }
-        bestStump.alpha = 0.5* Math.log((1 - bestStump.getWeightedError())/bestStump.getWeightedError());
+        return bestStump;
+    }
+
+    private static Stump countStump(List<PriceData> trainingSet, double[] weights, List<String> columnNames, Stump bestStump, int i, ColumnData columnData, double currentThreshold, char operation) {
+        Stump currentStump = new Stump(currentThreshold, operation, i, trainingSet.size(), columnNames);
+        currentStump.weightedError = currentStump.calculateColumnWeightedError(columnData, weights, trainingSet);
+        if (Double.compare(bestStump.weightedError, currentStump.weightedError) == 1) {
+            bestStump = currentStump;
+        }
         return bestStump;
     }
 

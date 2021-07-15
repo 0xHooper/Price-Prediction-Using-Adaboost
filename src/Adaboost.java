@@ -27,7 +27,7 @@ public class Adaboost {
         Arrays.fill(weights, (1.0/samplesCount));
 
         for (int i = 0; i < maxIteration; i++) {
-            Stump stump = Stump.bestStump(trainingSet, numberOfSteps, weights, columnNames);
+            Stump stump = Stump.findBestStump(trainingSet, numberOfSteps, weights, columnNames);
             model.add(stump);
 
             weights = updateWeights(stump, weights);
