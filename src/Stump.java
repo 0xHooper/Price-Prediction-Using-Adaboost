@@ -2,31 +2,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Stump {
-    public static final char OP_LESSER_THAN = '<';
-    public static final char OP_GREATER_THAN = '>';
-    public static final char[] OP_ARRAY = { OP_LESSER_THAN, OP_GREATER_THAN };
+    private static final char OP_LESSER_THAN = '<';
+    private static final char OP_GREATER_THAN = '>';
+    private static final char[] OP_ARRAY = { OP_LESSER_THAN, OP_GREATER_THAN };
     private final double threshold;
     private final char operation;
     private final int columnIndex;
     private double weightedError;
-    double alpha;
-    private final int[] classEst;
-    public List<String> columnNames;
+    private double alpha;
+    private final int[] classifiedAs;
+    private final List<String> columnNames;
 
     private Stump(double threshold, char operation, int columnIndex, int samplesCount, List<String> columnNames) {
         this.threshold = threshold;
         this.operation = operation;
         this.columnIndex = columnIndex;
-        this.classEst = new int[samplesCount];
+        this.classifiedAs = new int[samplesCount];
         this.columnNames = columnNames;
     }
 
     public static Stump bestStump(List<PriceData> trainingSet, int numberOfSteps, double[] weights, List<String> columnNames) {
-        int columnsCount = trainingSet.get(0).numbersData.size();
+        int numberOfColumns = trainingSet.get(0).numbersData.size();
         Stump bestStump = new Stump(0,'0',0,0, columnNames);
         double minError = Double.MAX_VALUE;
 
-        for (int i = 4; i < columnsCount; i++) {
+        for (int i = 4; i < numberOfColumns; i++) {
             ColumnData columnData = getColumnData(trainingSet, i);
             double stepSize = (columnData.max - columnData.min)/numberOfSteps;
             double currentThreshold = columnData.min + stepSize;
@@ -70,9 +70,8 @@ public class Stump {
     }
     
     private double calculateWeightedError(double columnValue, double label, double weight, int index) {
-        int stumpLabel = classify(columnValue);
-        classEst[index] = stumpLabel;
-        return stumpLabel == label ? 0 : weight;
+        classifiedAs[index] = classify(columnValue);
+        return classifiedAs[index] == label ? 0 : weight;
     }
 
     private static ColumnData getColumnData(List<PriceData> set, int columnIndex){
@@ -92,8 +91,12 @@ public class Stump {
         return weightedError;
     }
 
-    public int[] getClassEst() {
-        return classEst;
+    public int getClassifiedAs(int index) {
+        return classifiedAs[index];
+    }
+
+    public double getAlpha() {
+        return alpha;
     }
 
     @Override
