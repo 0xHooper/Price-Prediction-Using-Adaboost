@@ -28,10 +28,9 @@ public class Adaboost {
     }
 
     public int classify(List<Double> observation){
-        double sum = 0;
-        for (Stump classifier : model){
-            sum += classifier.classify(observation)*classifier.alpha;
-        }
+        double sum = model.stream()
+                .mapToDouble(classifier -> classifier.classify(observation) * classifier.alpha)
+                .sum();
         if (Double.compare(sum, 0) == 1)
             return 1;
         return -1;
@@ -50,14 +49,10 @@ public class Adaboost {
         }
     }
 
-    private double[] normalizeWeights(double[] inputWeights) {
-        double total = 0;
-        for (double inputWeight : inputWeights)
-            total += inputWeight;
-        for (int i = 0; i < inputWeights.length; i++) {
-            inputWeights[i] /= total;
-        }
-        return inputWeights;
+    private double[] normalizeWeights(double[] weights) {
+        double total = Arrays.stream(weights).sum();
+        IntStream.range(0, weights.length).forEach(i -> weights[i] /= total);
+        return weights;
     }
 
     public List<Stump> getModel() {
