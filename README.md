@@ -13,7 +13,7 @@ Whole simulation process is about changing:
 5)	Technical analysis indicators. I have used only RSI(14) and MACD(12, 26), as it was enough for ETH/USD
 
 Metodology and solution
-Program consists of 8 classes:
+Program consists of 8 classes
 **Main** – class for setting variables values mentioned above
 **PriceData** – wraps data from csv file
 **DataImporter** – imports data from csv file to a list of PriceData type
