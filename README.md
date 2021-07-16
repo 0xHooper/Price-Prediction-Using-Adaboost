@@ -14,10 +14,10 @@ Whole simulation process is about changing:
 
 Metodology and solution
 Program consists of 8 classes:
-Main – class for setting variables values mentioned above
-PriceData – wraps data from csv file
-DataImporter – imports data from csv file to a list of PriceData type
-DataPreparation – prepares imported data for simulation. 
+**Main** – class for setting variables values mentioned above
+**PriceData** – wraps data from csv file
+**DataImporter** – imports data from csv file to a list of PriceData type
+**DataPreparation** – prepares imported data for simulation. 
 First it labels data for binary classification. It marks row of data as 1 if it the price will hit the Take Profit level, before Stop Loss level. And marks it as -1 otherwise.
 Then it changes position of indicators values in order for algorithm to not have data, that it wouldn’t have in real time environment.
 Finally it splits data into training and testing sets.
