@@ -22,7 +22,7 @@ public class DataPreparation {
     private void splitDataIntoSets(int numberOfNotTradeWeWant, int numberOfMakeTradeWeWant) {
         for (int i = 0; i< priceData.size(); i++) {
             if (i==0)
-                System.out.println("Training test start date " + priceData.get(i).date);
+                System.out.println("Training set start date " + priceData.get(i).date);
             PriceData h = priceData.get(i);
             if (h.label == 1) {
                 if (numberOfMakeTradeWeWant > 0) {
@@ -34,7 +34,7 @@ public class DataPreparation {
                 numberOfNotTradeWeWant--;
             }
             if (numberOfMakeTradeWeWant == 0 && numberOfNotTradeWeWant == 0 && testingSet.isEmpty())
-                System.out.println("Testing test start date " + h.date);
+                System.out.println("Testing set start date " + h.date);
             if (numberOfMakeTradeWeWant == 0 && numberOfNotTradeWeWant == 0) {
                 testingSet.add(h);
             }
