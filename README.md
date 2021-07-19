@@ -62,3 +62,13 @@ Program consists of 7 classes
 - Count max wins and losses in a row
 - Count potential profit for a given position size
 
+
+## Output
+Program outputs on the console
+- Starting point of training set
+- Starting point of testing set
+- treshold, operation, indicator name and alpha for each stump in the model
+- Number of won trades and all trades
+- Precision
+- Maximum number of wins and losses in a row
+- Potential profit for given position size
